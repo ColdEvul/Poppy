@@ -6,10 +6,12 @@ class Poppy {
         class postInit {};
         class applyLoadout {};
         class createBriefingEntry {};
+        class findLoadableWeapon {};
         class getSideConfig {};
         class logError {};
         class logInfo {};
         class logWarning {};
+        class selectLoadout {};
         class synchGroupIDs {};
     };
     class ACRE {

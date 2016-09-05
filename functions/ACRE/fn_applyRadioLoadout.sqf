@@ -1,19 +1,18 @@
 #include "..\script_component.hpp"
-params ["_unit"];
+params ["_unit", "_loadout"];
 
 if ((!isMultiplayer) || {!(isPlayer _unit)}) then {
     // All units need to receive a 343 to check if there is enough inventory space for one
     _unit unlinkItem "ItemRadio";
-    _unit addItem "ACRE_PRC343";
     switch (true) do {
-        case !(_unit canAdd "ACRE_PRC343"):              { GVAR(delayedItems) pushBack "ACRE_PRC343" };
-        case (_unit canAddItemToUniform "ACRE_PRC343"):     { _unit addItemToUniform "ACRE_PRC343" };
+        case !(_unit canAdd "ACRE_PRC343"):              { GVAR(overflowItems) pushBack "ACRE_PRC343" };
+        case (_unit canAddItemToUniform "ACRE_PRC343"):  { _unit addItemToUniform "ACRE_PRC343" };
         case (_unit canAddItemToBackpack "ACRE_PRC343"): { _unit addItemToBackpack "ACRE_PRC343" };
         case (_unit canAddItemToVest "ACRE_PRC343"):     { _unit addItemToVest "ACRE_PRC343" };
     };
 };
 
-private _config = missionConfigFile >> "CfgLoadouts" >> typeOf _unit;
+private _config = missionConfigFile >> "CfgLoadouts" >> _loadout;
 if (isArray (_config >> "lrRadios") && {!(getArray (_config >> "lrRadios") isEqualTo [""])}) exitWith {
     [_unit, getArray (_config >> "lrRadios")] call FUNC(addLRRadios);
 };

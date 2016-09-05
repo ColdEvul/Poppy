@@ -8,9 +8,13 @@ if (_loadConfig) then {
     _config = missionConfigFile >> "CfgLoadouts" >> _loadout;
 };
 
-GVAR(delayedItems) = [];
+if (_loadConfig) then {
+    [_unit, _loadout] call compile (getText (_config >> "preLoadout"));
+};
+
+GVAR(overflowItems) = [];
 {
-    _function = missionNamespace getVariable (QUOTE(TRIPLES(PREFIX,fnc,replace)) + _x);
+    _function = missionNamespace getVariable (QFUNC(replace) + _x);
     if (_loadConfig) then {
         if (isArray (_config >> _x)) then {
             [_unit, getArray (_config >> _x)] call _function;
@@ -21,16 +25,17 @@ GVAR(delayedItems) = [];
 } forEach LOADOUT_INDEXES;
 
 if (GVAR(usesACRE)) then {
-    [_unit] spawn FUNC(setupRadios);
-    [_unit] call FUNC(applyRadioLoadout);
+    [_unit] call FUNC(setupRadios);
+    [_unit, _loadout] call FUNC(applyRadioLoadout);
 };
 
 // Delayed items
 {
-    if (_unit canAdd _x) then {
-        _unit addItem _x;
-    } else {
-        ["Inventory full! Could not add """ + _x + """ to """ + (typeOf _unit) + """."] call FUNC(logWarning);
-    };
-    false
-} count GVAR(delayedItems);
+    ["Inventory full! Could not add """ + _x + """ to """ + (typeOf _unit) + """."] call FUNC(logWarning);
+} count GVAR(overflowItems);
+
+_unit selectWeapon (primaryWeapon _unit);
+
+if (_loadConfig) then {
+    [_unit, _loadout] call compile (getText (_config >> "postLoadout"));
+};
